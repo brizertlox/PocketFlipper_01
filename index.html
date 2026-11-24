@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#111111">
+<title>Pocket Flipper</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101010;color:white;font-family:Arial,sans-serif}
+header{background:#ff8200;color:#111;padding:22px;border-radius:0 0 22px 22px}
+header h1{margin:0;font-size:25px}
+header p{font-size:11px;margin:7px 0 0}
+main{padding:16px 16px 85px}
+.panel{background:#1d1d1d;border:1px solid #383838;border-radius:15px;padding:17px;margin-bottom:16px}
+.status{color:#ff9700;font-size:12px}
+h2{font-size:17px;margin-top:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.tool{background:#202020;border:1px solid #3b3b3b;border-radius:14px;padding:18px 8px;text-align:center;cursor:pointer}
+.tool:active{background:#414141}
+.emoji{font-size:30px}
+.tool p{font-size:13px;margin:9px 0 0}
+button{background:#ff8500;color:#111;border:0;padding:13px;border-radius:9px;font-weight:bold;width:100%;margin-top:10px}
+input{background:#111;color:white;border:1px solid #555;padding:12px;border-radius:8px;width:100%;margin-top:8px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#1b1b1b;display:flex;justify-content:space-around;padding:10px;border-top:1px solid #444}
+nav button{width:auto;background:none;color:white;margin:0}
+#output{overflow-wrap:anywhere;font-size:14px;line-height:1.5}
+footer{text-align:center;color:#777;font-size:11px;padding:15px}
+</style>
+</head>
+<body>
+<header>
+<h1>🐬 POCKET FLIPPER</h1>
+<p>PORTABLE MULTITOOL • ANDROID EDITION</p>
+</header>
+
+<main>
+<div class="panel">
+<div class="status">● SYSTEM ONLINE</div>
+<h2>Привет, исследователь!</h2>
+<p>Твой карманный мультитул готов.</p>
+<p>Устройство: <span id="device">Android</span></p>
+<p>Батарея: <span id="battery">Проверка...</span></p>
+</div>
+
+<h2>Инструменты</h2>
+<div class="grid">
+<div class="tool" onclick="showTool('wifi')"><div class="emoji">📡</div><p>Wi-Fi Scanner</p></div>
+<div class="tool" onclick="showTool('bluetooth')"><div class="emoji">🔵</div><p>Bluetooth</p></div>
+<div class="tool" onclick="showTool('nfc')"><div class="emoji">💳</div><p>NFC Tools</p></div>
+<div class="tool" onclick="showTool('ir')"><div class="emoji">📺</div><p>IR Remote</p></div>
+<div class="tool" onclick="showTool('password')"><div class="emoji">🔐</div><p>Password Generator</p></div>
+<div class="tool" onclick="showTool('device')"><div class="emoji">📱</div><p>Device Info</p></div>
+<div class="tool" onclick="showTool('battery')"><div class="emoji">🔋</div><p>Battery Info</p></div>
+<div class="tool" onclick="showTool('about')"><div class="emoji">🐬</div><p>About</p></div>
+</div>
+
+<div class="panel" style="margin-top:17px">
+<h2 id="title">Консоль</h2>
+<div class="status">POCKET FLIPPER TERMINAL</div>
+<div id="output">Выбери инструмент выше.</div>
+</div>
+<footer>POCKET FLIPPER v1.0<br>ANDROID SAFE EDITION</footer>
+</main>
+
+<nav>
+<button onclick="location.reload()">⌂<br>Домой</button>
+<button onclick="showTool('wifi')">◉<br>Сеть</button>
+<button onclick="showTool('password')">⚙<br>Tools</button>
+<button onclick="showTool('about')">ⓘ<br>Info</button>
+</nav>
+
+<script>
+const output=document.getElementById('output');
+const title=document.getElementById('title');
+
+function showTool(type){
+const data={
+wifi:['Wi-Fi Scanner','<p>📡 Анализ Wi-Fi</p><p>Для просмотра сетей используй системные настройки Android.</p><button onclick="openWifi()">ОТКРЫТЬ НАСТРОЙКИ WI-FI</button>'],
+bluetooth:['Bluetooth','<p>🔵 Поиск Bluetooth-устройств.</p><p>Для сканирования требуется разрешение и поддержка браузера.</p><button onclick="openBluetooth()">НАСТРОЙКИ BLUETOOTH</button>'],
+nfc:['NFC Tools','<p>💳 NFC зависит от наличия NFC-модуля в телефоне.</p><p>Браузерная версия не может эмулировать банковские или пропускные карты.</p>'],
+ir:['IR Remote','<p>📺 Для управления телевизором нужен инфракрасный передатчик.</p><p>Если он отсутствует, телефон не сможет отправлять ИК-команды.</p>'],
+password:['Генератор паролей','<p>Длина пароля:</p><input id="passlen" type="number" value="20" min="8" max="64"><button onclick="generate()">СОЗДАТЬ ПАРОЛЬ</button><p id="generated"></p>'],
+device:['Информация об устройстве','<p>'+navigator.userAgent+'</p><p>Платформа: '+navigator.platform+'</p>'],
+battery:['Батарея','<p id="batteryinfo">Получение информации...</p>'],
+about:['О программе','<p>🐬 Pocket Flipper v1.0</p><p>Карманный набор инструментов для Android.</p><p>Работает без Root. Не изменяет системные файлы.</p>']
+};
+title.textContent=data[type][0];
+output.innerHTML=data[type][1];
+if(type==='battery')getBattery();
+}
+
+function openWifi(){location.href='intent:#Intent;action=android.settings.WIFI_SETTINGS;end'}
+function openBluetooth(){location.href='intent:#Intent;action=android.settings.BLUETOOTH_SETTINGS;end'}
+
+function generate(){
+const chars='abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*';
+let n=Math.max(8,Math.min(64,Number(document.getElementById('passlen').value)||20));
+let arr=new Uint32Array(n);
+crypto.getRandomValues(arr);
+let pass=Array.from(arr,x=>chars[x%chars.length]).join('');
+document.getElementById('generated').innerHTML='<b>'+pass+'</b><button onclick="copyPassword()">КОПИРОВАТЬ</button>';
+window.currentPassword=pass;
+}
+function copyPassword(){
+if(navigator.clipboard)navigator.clipboard.writeText(window.currentPassword).then(()=>alert('Пароль скопирован!')).catch(()=>alert(window.currentPassword));
+else alert(window.currentPassword);
+}
+async function getBattery(){
+let el=document.getElementById('batteryinfo');
+if(navigator.getBattery){
+let b=await navigator.getBattery();
+el.textContent='Заряд: '+Math.round(b.level*100)+'%';
+}else el.textContent='Данные батареи недоступны в этом браузере.';
+}
+if(navigator.getBattery){
+navigator.getBattery().then(b=>document.getElementById('battery').textContent=Math.round(b.level*100)+'%');
+}else document.getElementById('battery').textContent='Недоступно';
+document.getElementById('device').textContent=/Android/i.test(navigator.userAgent)?'Android':'Устройство';
+</script>
+</body>
+</html>
